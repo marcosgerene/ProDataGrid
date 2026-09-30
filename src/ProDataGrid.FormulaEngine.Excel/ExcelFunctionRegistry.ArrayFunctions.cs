@@ -36,6 +36,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             RegisterRadixDefaults();
             RegisterRankingExtensions();
             Register(new FrequencyFunction());
+            Register(new TrimMeanFunction());
         }
 
         partial void RegisterAdditionalDefaults();
