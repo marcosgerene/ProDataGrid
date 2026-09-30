@@ -30,6 +30,7 @@ internal static partial class Program
             ValidateAdditional(context, evaluator, resolver, parser);
             ValidateDescriptive(context, evaluator, resolver, parser);
             ValidateRanking(context, evaluator, resolver, parser);
+            ValidateFrequency(context, evaluator, resolver, parser);
             var names = new List<string>();
             foreach (var function in registry.GetAll()) names.Add(function.Name);
             names.Sort(StringComparer.Ordinal);
@@ -79,6 +80,7 @@ internal static partial class Program
             MeasureAdditional(output, context, evaluator, resolver, parser);
             MeasureDescriptive(output, context, reverse);
             MeasureRanking(output, context, reverse);
+            MeasureFrequency(output, context, reverse);
             File.WriteAllText(Path.Combine(destination, "measurements.csv"), output.ToString());
             Console.Write(output.ToString());
             return 0;
