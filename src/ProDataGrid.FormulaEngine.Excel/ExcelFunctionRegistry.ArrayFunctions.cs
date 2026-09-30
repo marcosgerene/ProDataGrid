@@ -37,6 +37,8 @@ namespace ProDataGrid.FormulaEngine.Excel
             RegisterRankingExtensions();
             Register(new FrequencyFunction());
             Register(new TrimMeanFunction());
+            Register(new ExcelModeFunction("MODE", multiple: false));
+            Register(new ExcelModeFunction("MODE.MULT", multiple: true));
         }
 
         partial void RegisterAdditionalDefaults();
