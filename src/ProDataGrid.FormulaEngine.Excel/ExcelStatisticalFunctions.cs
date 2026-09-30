@@ -20,53 +20,9 @@ namespace ProDataGrid.FormulaEngine.Excel
             => ExcelOrderStatistics.Median(context, args);
     }
 
-    internal sealed class ModeSingleFunction : ExcelFunctionBase
+    internal sealed class ModeSingleFunction : ExcelModeFunction
     {
-        public ModeSingleFunction()
-            : base("MODE.SNGL", new FormulaFunctionInfo(1, -1))
-        {
-        }
-
-        public override FormulaValue Invoke(FormulaFunctionContext context, IReadOnlyList<FormulaValue> args)
-        {
-            if (!ExcelStatisticalUtilities.TryCollectNumbers(context.EvaluationContext.Workbook.Settings, args, out var numbers, out var error))
-            {
-                return FormulaValue.FromError(error);
-            }
-
-            if (numbers.Count == 0)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.NA));
-            }
-
-            var counts = new Dictionary<double, int>();
-            for (var i = 0; i < numbers.Count; i++)
-            {
-                var value = numbers[i];
-                counts.TryGetValue(value, out var count);
-                counts[value] = count + 1;
-            }
-
-            var bestCount = 1;
-            var bestValue = 0d;
-            var found = false;
-            foreach (var pair in counts)
-            {
-                if (pair.Value > bestCount)
-                {
-                    bestCount = pair.Value;
-                    bestValue = pair.Key;
-                    found = true;
-                }
-            }
-
-            if (!found)
-            {
-                return FormulaValue.FromError(new FormulaError(FormulaErrorType.NA));
-            }
-
-            return ExcelFunctionUtilities.CreateNumber(context, bestValue);
-        }
+        public ModeSingleFunction() : base("MODE.SNGL", multiple: false) { }
     }
 
     internal sealed class StdevSFunction : ExcelDescriptiveFunction
