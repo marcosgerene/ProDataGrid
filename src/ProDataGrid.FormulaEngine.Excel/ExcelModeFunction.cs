@@ -74,11 +74,25 @@ namespace ProDataGrid.FormulaEngine.Excel
                 var length = (long)array.RowCount * array.ColumnCount;
                 if (length > remaining) { error = new FormulaError(FormulaErrorType.Num); return false; }
                 remaining -= (int)length;
-                for (var row = 0; row < array.RowCount; row++)
-                    for (var column = 0; column < array.ColumnCount; column++)
+                var rows = array.RowCount;
+                var columns = array.ColumnCount;
+                var precision = settings.ApplyNumberPrecision;
+                var digits = settings.NumberPrecisionDigits;
+                for (var row = 0; row < rows; row++)
+                    for (var column = 0; column < columns; column++)
                     {
                         if (!array.IsPresent(row, column)) continue;
-                        if (!TryScalar(ref counter, array[row, column], true, settings, out error)) return false;
+                        var item = array[row, column];
+                        if (item.Kind == FormulaValueKind.Number)
+                        {
+                            // Avoid the general scalar-coercion dispatch for the common
+                            // numeric array path; the precision/error contract is identical.
+                            var number = item.AsNumber();
+                            if (precision) number = FormulaNumberUtilities.ApplyPrecision(number, digits);
+                            if (!double.IsFinite(number) || !counter.TryAdd(number))
+                            { error = new FormulaError(FormulaErrorType.Num); return false; }
+                        }
+                        else if (!TryScalar(ref counter, item, true, settings, out error)) return false;
                     }
                 return true;
             }
