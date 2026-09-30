@@ -5,6 +5,7 @@
 
 using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using ProDataGrid.FormulaEngine;
 
 namespace ProDataGrid.FormulaEngine.Excel
@@ -30,6 +31,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             _firstValue = 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryAdd(double number)
         {
             var slot = FindSlot(_slots, number);
@@ -82,6 +84,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             return FormulaValue.FromArray(result);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private bool Grow()
         {
             if (_slots.Length > Array.MaxLength / 2) return false;
@@ -97,6 +100,7 @@ namespace ProDataGrid.FormulaEngine.Excel
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int FindSlot(Span<ModeEntry> slots, double number)
         {
             // Canonical hash for signed zero. NaN/infinity are rejected before insertion.
