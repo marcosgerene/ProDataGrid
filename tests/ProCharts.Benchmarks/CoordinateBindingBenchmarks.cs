@@ -119,6 +119,12 @@ internal static class CoordinateBindingBenchmarks
         public void VerifyLast()
         {
             var view = _last ?? throw new InvalidOperationException("Missing capture.");
+            // Both lookup paths must normalize to the exact same cached view as the existing direct query,
+            // not merely agree on endpoints/counts while choosing different interior rows. This check is
+            // outside measured runs (and on every warmup capture); the next measured operation resets history.
+            var expected = _source.BuildLatestViewByX(64, 128, ChartDownsampleMode.MinMax);
+            if (!ReferenceEquals(view, expected))
+                throw new InvalidOperationException("Lookup did not resolve the same complete selected-row capture.");
             if (view.WindowCount != 257 || view.SourceSampleIndices[^1] != view.TotalSamples - 1)
                 throw new InvalidOperationException("The trailing capture lost an endpoint.");
             for (int i = 0; i < view.SourceSampleIndices.Count; i++)
