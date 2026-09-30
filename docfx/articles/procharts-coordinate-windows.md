@@ -2,6 +2,8 @@
 
 `StreamingMultiSeriesChartDataSource.BuildViewByX` captures a numeric or encoded-date interval directly from retained ring history. It does not require a full-history snapshot or a linear scan to discover ordinal row offsets.
 
+For an automatically refreshing model rather than explicit snapshot calls, use [live coordinate-window binding](procharts-coordinate-binding.md). It composes fixed/trailing coordinate policies with existing model requests and dispatcher delivery.
+
 ```csharp
 StreamingMultiSeriesChartView view = source.BuildViewByX(
     minimumX: 1_000,
@@ -49,7 +51,7 @@ Span units must match source X units. For OLE Automation date coordinates, a hal
 
 Lower/upper binary searches, optional expansion, selection, array copying and identity/history metadata capture all execute under the same source lock. Appending or evicting rows cannot shift the resolved window between lookup and capture. Returned views remain owned and unchanged after subsequent append or Clear; numbering still restarts after Clear.
 
-These are explicit **source APIs**, not a new `ChartDataRequest` mode. They do not change `ChartModel.Request`, establish an automatic live coordinate viewport, set axis limits, or supply numeric-X positioning for category Line/Area rendering. Each trailing query re-anchors only when invoked. Use the existing numeric/date Scatter rendering for true X placement. A view's identity map must not be combined with the model's independently captured snapshot. See [synchronized streams](procharts-multi-series-streaming.md) for renderer, delivery and ownership contracts.
+These are explicit **source APIs**, not a new `ChartDataRequest` mode. They do not change `ChartModel.Request`, set axis limits, or supply numeric-X positioning for category Line/Area rendering. Each direct trailing query re-anchors only when invoked; the separate coordinate-window adapter supplies live model refresh integration. Use the existing numeric/date Scatter rendering for true X placement. A view's identity map must not be combined with the model's independently captured snapshot. See [synchronized streams](procharts-multi-series-streaming.md) for renderer, delivery and ownership contracts.
 
 ## Complexity and measured comparison
 

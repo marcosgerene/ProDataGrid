@@ -66,6 +66,7 @@ Console.WriteLine("Append baseline is an intentionally shifting List<T>, not a m
 IndicatorBenchmarks.Run(Measure);
 MultiSeriesBenchmarks.Run();
 XRangeBenchmarks.Run();
+CoordinateBindingBenchmarks.Run();
 
 static void Measure(string name, Action operation)
 {

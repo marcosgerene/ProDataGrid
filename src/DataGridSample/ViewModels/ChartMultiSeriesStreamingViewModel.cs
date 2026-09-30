@@ -30,13 +30,16 @@ namespace DataGridSample.ViewModels
             RunCommand = ReactiveCommand.Create(() => SetRunning(!IsRunning));
             AppendCommand = ReactiveCommand.Create(AppendBatch);
             ResetCommand = ReactiveCommand.Create(ResetFeed);
-            LatestCommand = ReactiveCommand.Create(() => Model?.ShowLatest(VisibleRows));
+            LatestCommand = ReactiveCommand.Create(UseLatestRows);
+            FollowSpanCommand = ReactiveCommand.Create(() => FollowLatestSpan(120));
+            PinWindowCommand = ReactiveCommand.Create(PinDisplayedWindow);
             SmallBudgetCommand = ReactiveCommand.Create(() => SetPointBudget(128));
             LargeBudgetCommand = ReactiveCommand.Create(() => SetPointBudget(512));
             FullWindowCommand = ReactiveCommand.Create(() => SetPointBudget(null));
         }
 
         public StreamingMultiSeriesChartDataSource? Source { get; private set; }
+        public CoordinateWindowChartDataSource? WindowSource { get; private set; }
         public ChartModel? Model { get; private set; }
         public bool IsActive => Source != null;
         public bool IsRunning => _isRunning;
@@ -46,6 +49,8 @@ namespace DataGridSample.ViewModels
         public ICommand AppendCommand { get; }
         public ICommand ResetCommand { get; }
         public ICommand LatestCommand { get; }
+        public ICommand FollowSpanCommand { get; }
+        public ICommand PinWindowCommand { get; }
         public ICommand SmallBudgetCommand { get; }
         public ICommand LargeBudgetCommand { get; }
         public ICommand FullWindowCommand { get; }
@@ -64,7 +69,8 @@ namespace DataGridSample.ViewModels
             try
             {
                 _nextX = 0; Seed();
-                _delivered = new CoalescingChartDataSource(Source, context);
+                WindowSource = new CoordinateWindowChartDataSource(Source);
+                _delivered = new CoalescingChartDataSource(WindowSource, context);
                 Model = new ChartModel();
                 using (Model.DeferRefresh())
                 {
@@ -85,7 +91,8 @@ namespace DataGridSample.ViewModels
         {
             SetRunning(false);
             if (Model != null) { Model.SnapshotChanged -= OnSnapshotChanged; Model.Dispose(); Model = null; }
-            _delivered?.Dispose(); _delivered = null; Source = null;
+            _delivered?.Dispose(); _delivered = null;
+            WindowSource?.Dispose(); WindowSource = null; Source = null;
             RaiseSessionChanged();
             SetStatus("Feed stopped and detached. Reopening starts a fresh paused session.");
         }
@@ -97,7 +104,42 @@ namespace DataGridSample.ViewModels
             SetRunning(false);
             StreamingMultiSeriesChartDataSource source = RequireSource();
             source.Clear(); _nextX = 0; Seed();
-            Model!.ShowLatest(VisibleRows);
+            UseLatestRows();
+        }
+
+        /// <summary>Restores the original latest-row navigation over all retained coordinates.</summary>
+        public void UseLatestRows()
+        {
+            RequireSource();
+            using (Model!.DeferRefresh())
+            {
+                WindowSource!.Window = ChartCoordinateWindow.All;
+                Model.ShowLatest(VisibleRows);
+            }
+        }
+
+        /// <summary>Follows an elapsed span in the synthetic feed's X units, independently of sample density.</summary>
+        public void FollowLatestSpan(double span) => SetCoordinateWindow(ChartCoordinateWindow.Latest(span));
+
+        /// <summary>Pins the displayed coordinate endpoints, not a separately read producer version.</summary>
+        public bool PinDisplayedWindow()
+        {
+            RequireSource();
+            var snapshot = Model!.Snapshot;
+            if (snapshot.Series.Count == 0 || snapshot.Series[0].XValues is not { Count: > 0 } x) return false;
+            SetCoordinateWindow(ChartCoordinateWindow.Between(x[0], x[^1]));
+            return true;
+        }
+
+        private void SetCoordinateWindow(ChartCoordinateWindow window)
+        {
+            RequireSource();
+            using (Model!.DeferRefresh())
+            {
+                Model.Interaction.FollowLatest = false;
+                Model.Request.WindowStart = null; Model.Request.WindowCount = null;
+                WindowSource!.Window = window;
+            }
         }
 
         public void SetPointBudget(int? budget)
@@ -145,15 +187,22 @@ namespace DataGridSample.ViewModels
         private void SetStatus(string value) => this.RaiseAndSetIfChanged(ref _status, value, nameof(StatusText));
         private void RaiseSessionChanged()
         {
-            this.RaisePropertyChanged(nameof(Source)); this.RaisePropertyChanged(nameof(Model));
-            this.RaisePropertyChanged(nameof(IsActive));
+            this.RaisePropertyChanged(nameof(Source)); this.RaisePropertyChanged(nameof(WindowSource));
+            this.RaisePropertyChanged(nameof(Model)); this.RaisePropertyChanged(nameof(IsActive));
         }
         private void UpdateStatus()
         {
-            if (Source == null || Model == null) return;
-            StreamingMultiSeriesChartView captured = Source.BuildView(Model.Request);
+            if (WindowSource == null || Model == null) return;
+            StreamingMultiSeriesChartView captured = WindowSource.BuildView(Model.Request);
             string budget = Model.Request.DownsampleMode == ChartDownsampleMode.None ? "full window" : $"{Model.Request.MaxPoints} per channel";
-            SetStatus($"{(IsRunning ? "Running" : "Paused")} | Accepted: {captured.TotalSamples:N0} rows | Retained: {captured.RetainedCount:N0}/{HistoryCapacity:N0} | Window: {captured.WindowCount:N0} | Shared output: {captured.SourceSampleIndices.Count:N0} rows | Budget: {budget}. Synthetic consumer-thread feed; these counters are not FPS or latency measurements.");
+            ChartCoordinateWindow window = WindowSource.Window;
+            string policy = window.Kind switch
+            {
+                ChartCoordinateWindowKind.Fixed => $"pinned X [{window.MinimumX:G6}, {window.MaximumX:G6}]",
+                ChartCoordinateWindowKind.Latest => $"latest {window.Span:G6} X units",
+                _ => "ordinal rows"
+            };
+            SetStatus($"{(IsRunning ? "Running" : "Paused")} | Accepted: {captured.TotalSamples:N0} rows | Retained: {captured.RetainedCount:N0}/{HistoryCapacity:N0} | Window: {captured.WindowCount:N0} | Shared output: {captured.SourceSampleIndices.Count:N0} rows | Budget: {budget} | {policy}. Synthetic consumer-thread feed; these counters are not FPS or latency measurements.");
         }
     }
 }
