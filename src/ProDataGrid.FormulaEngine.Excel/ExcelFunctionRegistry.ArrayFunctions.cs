@@ -39,6 +39,9 @@ namespace ProDataGrid.FormulaEngine.Excel
             Register(new TrimMeanFunction());
             Register(new ExcelModeFunction("MODE", multiple: false));
             Register(new ExcelModeFunction("MODE.MULT", multiple: true));
+            Register(new ExcelLogicalAggregateFunction("AVERAGEA", ExcelLogicalAggregateOperation.Average));
+            Register(new ExcelLogicalAggregateFunction("MINA", ExcelLogicalAggregateOperation.Minimum));
+            Register(new ExcelLogicalAggregateFunction("MAXA", ExcelLogicalAggregateOperation.Maximum));
         }
 
         partial void RegisterAdditionalDefaults();
