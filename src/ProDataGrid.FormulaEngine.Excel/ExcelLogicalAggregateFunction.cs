@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using ProDataGrid.FormulaEngine;
 
 namespace ProDataGrid.FormulaEngine.Excel
@@ -72,9 +73,33 @@ namespace ProDataGrid.FormulaEngine.Excel
                 var length = (long)array.RowCount * array.ColumnCount;
                 if (length > remaining) { error = new FormulaError(FormulaErrorType.Num); return false; }
                 remaining -= (int)length;
-                for (var row = 0; row < array.RowCount; row++)
-                    for (var column = 0; column < array.ColumnCount; column++)
-                        if (array.IsPresent(row, column) && !TryScalar(ref state, array[row, column], true, settings, out error)) return false;
+                var rows = array.RowCount;
+                var columns = array.ColumnCount;
+                var precision = settings.ApplyNumberPrecision;
+                var digits = settings.NumberPrecisionDigits;
+                for (var row = 0; row < rows; row++)
+                    for (var column = 0; column < columns; column++)
+                    {
+                        if (!array.IsPresent(row, column)) continue;
+                        var item = array[row, column];
+                        double number;
+                        // Array provenance is known here: no culture/text conversion or
+                        // general scalar dispatch is needed for each observation.
+                        switch (item.Kind)
+                        {
+                            case FormulaValueKind.Blank: continue;
+                            case FormulaValueKind.Number:
+                                number = item.AsNumber();
+                                if (precision) number = FormulaNumberUtilities.ApplyPrecision(number, digits);
+                                if (!double.IsFinite(number)) { error = new FormulaError(FormulaErrorType.Num); return false; }
+                                break;
+                            case FormulaValueKind.Boolean: number = item.AsBoolean() ? 1 : 0; break;
+                            case FormulaValueKind.Text: number = 0; break;
+                            case FormulaValueKind.Error: error = item.AsError(); return false;
+                            default: error = new FormulaError(FormulaErrorType.Value); return false;
+                        }
+                        state.Add(number);
+                    }
                 return true;
             }
             if (remaining == 0) { error = new FormulaError(FormulaErrorType.Num); return false; }
@@ -126,6 +151,7 @@ namespace ProDataGrid.FormulaEngine.Excel
                 _count = 0;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public void Add(double number)
             {
                 if (_operation == ExcelLogicalAggregateOperation.Average) _mean.Add(number);
