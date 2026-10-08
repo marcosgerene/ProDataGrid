@@ -1018,9 +1018,6 @@ public class DataGridCell : ContentControl, INotifyPropertyChanged, IDataContext
       <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.eventargs">StyledElement.OnDataContextChanged(EventArgs)</a>
     </div>
     <div>
-      <span class="xref">StyledElement.OnDataContextBeginUpdate()</span>
-    </div>
-    <div>
       <span class="xref">StyledElement.OnDataContextEndUpdate()</span>
     </div>
     <div>
@@ -1647,7 +1644,7 @@ Column templates and editors remain ordinary retained Avalonia controls.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_ArrangeOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCell.ArrangeOverride(Avalonia.Size)">
   ArrangeOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L363"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L378"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Positions child elements as part of a layout pass.</p>
@@ -1686,7 +1683,7 @@ Column templates and editors remain ordinary retained Avalonia controls.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_MeasureOverride_Avalonia_Size_" data-uid="Avalonia.Controls.DataGridCell.MeasureOverride(Avalonia.Size)">
   MeasureOverride(Size)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L351"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L366"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Measures the control and its child elements as part of a layout pass.</p>
@@ -1725,7 +1722,7 @@ Column templates and editors remain ordinary retained Avalonia controls.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnApplyTemplate_Avalonia_Controls_Primitives_TemplateAppliedEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnApplyTemplate(Avalonia.Controls.Primitives.TemplateAppliedEventArgs)">
   OnApplyTemplate(TemplateAppliedEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L332"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L347"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Builds the visual tree for the cell control when a new template is applied.</p>
@@ -1786,11 +1783,38 @@ Column templates and editors remain ordinary retained Avalonia controls.</p>
 
 
 
+  <a id="Avalonia_Controls_DataGridCell_OnDataContextBeginUpdate_" data-uid="Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate*"></a>
+
+  <h3 id="Avalonia_Controls_DataGridCell_OnDataContextBeginUpdate" data-uid="Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate">
+  OnDataContextBeginUpdate()
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L330"><i class="bi bi-code-slash"></i></a>
+  </h3>
+
+  <div class="markdown level1 summary"><p>Called when the <span class="xref">Avalonia.StyledElement.DataContext</span> begins updating.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override void OnDataContextBeginUpdate()</code></pre>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
   <a id="Avalonia_Controls_DataGridCell_OnGettingFocus_" data-uid="Avalonia.Controls.DataGridCell.OnGettingFocus*"></a>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnGettingFocus_Avalonia_Input_FocusChangingEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnGettingFocus(Avalonia.Input.FocusChangingEventArgs)">
   OnGettingFocus(FocusChangingEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L451"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L466"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"></div>
@@ -1821,7 +1845,7 @@ Column templates and editors remain ordinary retained Avalonia controls.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnPointerEntered_Avalonia_Input_PointerEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnPointerEntered(Avalonia.Input.PointerEventArgs)">
   OnPointerEntered(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L432"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L447"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerEnteredEvent</span> reaches an element in its
@@ -1856,7 +1880,7 @@ for this event.</p>
 
   <h3 id="Avalonia_Controls_DataGridCell_OnPointerExited_Avalonia_Input_PointerEventArgs_" data-uid="Avalonia.Controls.DataGridCell.OnPointerExited(Avalonia.Input.PointerEventArgs)">
   OnPointerExited(PointerEventArgs)
-  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L441"><i class="bi bi-code-slash"></i></a>
+  <a class="header-action link-secondary" title="View source" href="https://github.com/marcosgerene/ProDataGrid/blob/master/src/Avalonia.Controls.DataGrid/DataGridCell.cs/#L456"><i class="bi bi-code-slash"></i></a>
   </h3>
 
   <div class="markdown level1 summary"><p>Invoked when an unhandled <span class="xref">Avalonia.Input.InputElement.PointerExitedEvent</span> reaches an element in its

@@ -9633,6 +9633,19 @@ references:
   isSpec: "True"
   fullName: Avalonia.Controls.DataGridCell.OnCreateAutomationPeer
   nameWithType: DataGridCell.OnCreateAutomationPeer
+- uid: Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate
+  name: OnDataContextBeginUpdate()
+  href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OnDataContextBeginUpdate
+  commentId: M:Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate
+  fullName: Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate()
+  nameWithType: DataGridCell.OnDataContextBeginUpdate()
+- uid: Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate*
+  name: OnDataContextBeginUpdate
+  href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OnDataContextBeginUpdate_
+  commentId: Overload:Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate
+  isSpec: "True"
+  fullName: Avalonia.Controls.DataGridCell.OnDataContextBeginUpdate
+  nameWithType: DataGridCell.OnDataContextBeginUpdate
 - uid: Avalonia.Controls.DataGridCell.OnGettingFocus(Avalonia.Input.FocusChangingEventArgs)
   name: OnGettingFocus(FocusChangingEventArgs)
   href: api/Avalonia.Controls.DataGridCell.html#Avalonia_Controls_DataGridCell_OnGettingFocus_Avalonia_Input_FocusChangingEventArgs_
