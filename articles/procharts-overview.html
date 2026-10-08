@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+      <title>ProCharts overview | ProDataGrid for Avalonia </title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="title" content="ProCharts overview | ProDataGrid for Avalonia ">
+      
+      
+      <link rel="icon" href="../favicon.ico">
+      <link rel="stylesheet" href="../public/docfx.min.css">
+      <link rel="stylesheet" href="../public/main.css">
+      <meta name="docfx:navrel" content="../toc.html">
+      <meta name="docfx:tocrel" content="toc.html">
+      
+      
+      
+      
+      <meta name="docfx:docurl" content="https://github.com/marcosgerene/ProDataGrid/blob/master/docfx/articles/procharts-overview.md/#L1">
+      <meta name="loc:inThisArticle" content="In this article">
+      <meta name="loc:searchResultsCount" content="{count} results for &quot;{query}&quot;">
+      <meta name="loc:searchNoResults" content="No results for &quot;{query}&quot;">
+      <meta name="loc:tocFilter" content="Filter by title">
+      <meta name="loc:nextArticle" content="Next">
+      <meta name="loc:prevArticle" content="Previous">
+      <meta name="loc:themeLight" content="Light">
+      <meta name="loc:themeDark" content="Dark">
+      <meta name="loc:themeAuto" content="Auto">
+      <meta name="loc:changeTheme" content="Change theme">
+      <meta name="loc:copy" content="Copy">
+      <meta name="loc:downloadPdf" content="Download PDF">
+
+      <script type="module" src="./../public/docfx.min.js"></script>
+
+      <script>
+        const theme = localStorage.getItem('theme') || 'auto'
+        document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
+      </script>
+
+  </head>
+
+  <body class="tex2jax_ignore" data-layout="" data-yaml-mime="">
+    <header class="bg-body border-bottom">
+      <nav id="autocollapse" class="navbar navbar-expand-md" role="navigation">
+        <div class="container-xxl flex-nowrap">
+          <a class="navbar-brand" href="../index.html">
+            <img id="logo" class="svg" src="../images/logo.svg" alt="">
+            
+          </a>
+          <button class="btn btn-lg d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navpanel" aria-controls="navpanel" aria-expanded="false" aria-label="Toggle navigation">
+            <i class="bi bi-three-dots"></i>
+          </button>
+          <div class="collapse navbar-collapse" id="navpanel">
+            <div id="navbar">
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container-xxl">
+      <div class="toc-offcanvas">
+        <div class="offcanvas-md offcanvas-start" tabindex="-1" id="tocOffcanvas" aria-labelledby="tocOffcanvasLabel">
+          <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="tocOffcanvasLabel">Table of Contents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#tocOffcanvas" aria-label="Close"></button>
+          </div>
+          <div class="offcanvas-body">
+            <nav class="toc" id="toc"></nav>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="actionbar">
+          <button class="btn btn-lg border-0 d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#tocOffcanvas" aria-controls="tocOffcanvas" aria-expanded="false" aria-label="Show table of contents">
+            <i class="bi bi-list"></i>
+          </button>
+
+          <nav id="breadcrumb"></nav>
+        </div>
+
+        <article data-uid="">
+<h1 id="procharts-overview">ProCharts overview</h1>
+
+<p>ProCharts separates chart data, rendering and UI integration into reusable libraries. It supports Cartesian, financial, statistical, matrix and hierarchical charts. Broad charting compatibility is a development goal, not a claim of complete Excel or industry-wide parity.</p>
+<h2 id="libraries">Libraries</h2>
+<table>
+<thead>
+<tr>
+<th>Library</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ProCharts</code></td>
+<td>Models, snapshots, axes, formatting, bounded scalar/interval streaming, hierarchy data/layout, batch transforms, persistent incremental indicators and coordinated interval decimation.</td>
+</tr>
+<tr>
+<td><code>ProCharts.Skia</code></td>
+<td>Skia rendering, hit testing, interaction indexing and PNG/SVG export.</td>
+</tr>
+<tr>
+<td><code>ProCharts.Avalonia</code></td>
+<td><code>ProChartView</code>, tooltips, viewport gestures and opt-in hierarchy navigation.</td>
+</tr>
+<tr>
+<td><code>ProDataGrid.Charting</code></td>
+<td>Grid, pivot, formula and generated-source adapters.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="create-a-live-chart-model">Create a live chart model</h2>
+<pre><code class="lang-csharp">var source = new StreamingChartDataSource(10_000, &quot;Signal&quot;, ChartSeriesKind.Scatter);
+source.AppendRange(new[]
+{
+    new ChartSample(0, 12),
+    new ChartSample(1, 18),
+    new ChartSample(2, null),
+    new ChartSample(3, 15)
+});
+using var model = new ChartModel { DataSource = source };
+model.CategoryAxis.Kind = ChartAxisKind.Value;
+model.Request.MaxPoints = 2_000;
+model.Request.DownsampleMode = ChartDownsampleMode.MinMax;
+</code></pre>
+<p>Bind the model to <code>ProChartView.ChartModel</code>. Keep it alive while its view is in use and dispose it when the owning application/view-model is finished. Data-source notifications run on their caller's thread; marshal worker ingestion appropriately before updating UI-bound models.</p>
+<p>The example uses Scatter with a numeric category axis for proportional X positioning. Existing Line/Area kinds use category-index positioning. RangeArea can use either category indices or aligned numeric/date/log X coordinates; mixing it with ordinary Line/Area uses category positioning for the plot.</p>
+<p>For headless use, build a <code>ChartDataSnapshot</code> through the source or construct categories and <code>ChartSeriesSnapshot</code> objects directly, then call <code>SkiaChartExporter.ExportPng</code> or <code>ExportSvg</code>. Snapshots should have stable contents; cached render/interaction state must not be fed silently mutated collections.</p>
+<h2 id="live-calculations-and-filled-intervals">Live calculations and filled intervals</h2>
+<p>Batch <code>ChartIndicators</code> methods analyze complete datasets. Persistent EMA, RSI, MACD and ATR calculators retain constant-size recurrence state. <code>StreamingRollingStatistics</code> shares one bounded window for arithmetic/weighted means and population/sample deviations; scalar adapters, <code>StreamingBollingerBands</code> and <code>StreamingDonchianChannels</code> provide the corresponding live transforms. Rolling engines retain O(period) state with amortized O(1) updates and occasional O(period) transfer/deque bursts. All are single-writer append-only calculators with allocation-free Push/Reset; corrections require replay, and display-ring eviction does not reset calculation history. See the <a href="procharts-incremental-indicators.html">incremental indicator guide</a> for warmup, numerical and latency contracts.</p>
+<p><code>ChartRangeSeries.CreateArea</code> owns aligned lower/upper channels, and <code>ChartBandSeries.ToRangeArea()</code> turns batch Bollinger or Donchian bands into a filled envelope. Streaming band/channel calculators emit <code>ChartBandValue</code> pairs that can be appended to a range source. Missing pairs break the fill. Interior tooltips retain endpoint identity and display both bounds.</p>
+<p><code>RangeChartDataSource</code> adds owned input, window-before-decimation preparation, atomic replacement and cached display views with original source-index maps. Paired MinMax/Adaptive selection keeps both boundaries' extrema and gap separators at shared source indices. Use a numeric/date/log X axis to retain original spacing; configure the source's logarithmic value domain when applicable. The reduced polygon approximates omitted detail rather than certifying an enclosing envelope. <code>None</code> restores every supplied interval. The <strong>ProCharts Range Area</strong> sample has an optional 100,000-observation mode with an 800-point reduction toggle; its original small mode retains the independent mean line.</p>
+<p><code>StreamingRangeChartDataSource</code> extends bounded ingestion to interval pairs: append validated batches without replacing the full retained dataset, preserve original 64-bit observation maps, and reduce ring windows through the same paired selector. It enforces increasing X, commits batches atomically and publishes owned snapshots. The Range Area page's <strong>Open bounded live interval demo</strong> provides a command-driven synthetic feed, with an optional persistent 32-price Bollinger calculation before display reduction. It is not an external live connection. See <a href="procharts-streaming-ranges.html">bounded streaming range areas</a> for threading, session identity, windowing and performance contracts.</p>
+<h2 id="data-and-interaction">Data and interaction</h2>
+<p>Grid adapters track sorting/filtering/grouping and formula results. Cached grid windows copy only the requested category/value/X/size slices; their initial source cache still needs to be built. Bounded streaming uses fixed-capacity history. Continuous-series decimation is not a substitute for hierarchy/matrix semantics, and interval boundaries must not be sampled independently.</p>
+<p>Repeated supported point and range-area queries can reuse indexed screen-space geometry. Index construction has an up-front time and memory cost, while warm queries avoid repeated data scans. <code>UseInteractionCache = false</code> retains the reference path, and <code>ClearInteractionCache</code> releases or invalidates managed state after in-place source changes. Ordered ranges use projected-interval binary search without bridging gaps or changing source-order selection; unordered raw ranges retain their scan. See the range-area guide for ownership, limits and separate interaction/full-versus-reduced CPU drawing diagnostics.</p>
+<p><code>ProChartView.HitTest</code> accepts local logical coordinates and supports label-free numeric data. Typed treemap/sunburst sources can enable branch double-click and back/root keyboard navigation through <code>ChartHierarchyNavigation.IsEnabled</code>. The sample's Hierarchy Explorer also supplies command buttons and a branch selector.</p>
+<h2 id="guides">Guides</h2>
+<ul>
+<li><a href="procharts-chart-model.html">Model and snapshots</a></li>
+<li><a href="procharts-data-sources.html">Data sources</a></li>
+<li><a href="procharts-streaming.html">Bounded scalar streaming</a></li>
+<li><a href="procharts-streaming-ranges.html">Bounded streaming range areas</a></li>
+<li><a href="procharts-incremental-indicators.html">Incremental and rolling indicators</a></li>
+<li><a href="procharts-windowing.html">Efficient grid windows</a></li>
+<li><a href="procharts-advanced-charts.html">Advanced chart families</a></li>
+<li><a href="procharts-indicators.html">Statistical and technical indicators</a></li>
+<li><a href="procharts-range-area.html">Filled range areas, coordinated decimation and analytical bands</a></li>
+<li><a href="procharts-hierarchy-navigation.html">Hierarchy navigation and public hit testing</a></li>
+<li><a href="procharts-interaction.html">Interaction</a></li>
+<li><a href="procharts-export-clipboard.html">Export and clipboard</a></li>
+</ul>
+<p>Additional diagram families, comprehensive accessibility semantics, late-data correction, coordinated multi-series overlay selection and physical-GPU performance qualification remain separate work. Measured preparation, calculation or CPU bitmap improvements do not imply measured UI frame-rate or GPU gains.</p>
+
+</article>
+
+        <div class="contribution d-print-none">
+          <a href="https://github.com/marcosgerene/ProDataGrid/blob/master/docfx/articles/procharts-overview.md/#L1" class="edit-link">Edit this page</a>
+        </div>
+
+        <div class="next-article d-print-none border-top" id="nextArticle"></div>
+
+      </div>
+
+      <div class="affix">
+        <nav id="affix"></nav>
+      </div>
+    </main>
+
+
+    <footer class="border-top text-secondary">
+      <div class="container-xxl">
+        <div class="flex-fill">
+          <span>Made with <a href="https://dotnet.github.io/docfx">docfx</a></span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
